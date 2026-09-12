@@ -1,8 +1,12 @@
 package com.vijay.platform.common.exception;
 
-public class BusinessException extends RuntimeException {
+import lombok.Getter;
 
-    public BusinessException(String message) {
+@Getter
+public class BusinessException extends RuntimeException {
+    private final String errorCode;
+    public BusinessException(String message, String errorCode) {
         super(message);
+        this.errorCode=errorCode;
     }
 }
