@@ -1,9 +1,6 @@
 package com.vijay.platform.authentication.controller;
 
-import com.vijay.platform.authentication.dto.LoginRequest;
-import com.vijay.platform.authentication.dto.LoginResponse;
-import com.vijay.platform.authentication.dto.RegisterRequest;
-import com.vijay.platform.authentication.dto.RegisterResponse;
+import com.vijay.platform.authentication.dto.*;
 import com.vijay.platform.authentication.service.AuthService;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.user.entity.User;
@@ -12,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +49,22 @@ public class AuthController {
                         "Login successful",
                         response
                 )
+        );
+    }
+
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+
+        authService.changePassword(
+                authentication.getName(),
+                request
+        );
+
+        return ApiResponse.success(
+                "Password changed successfully",
+                null
         );
     }
 }

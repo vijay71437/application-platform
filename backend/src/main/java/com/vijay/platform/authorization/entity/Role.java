@@ -1,5 +1,6 @@
 package com.vijay.platform.authorization.entity;
 
+import com.vijay.platform.user.entity.User;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @EqualsAndHashCode.Include
     @Column(unique = true,nullable = false,length = 100)
     private String name;
     @Column(nullable = false,length = 255)
@@ -36,4 +38,7 @@ public class Role {
     )
 
     private Set<Permission> permissions=new HashSet<>();
+
+    @ManyToMany(mappedBy = "roles",fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 }

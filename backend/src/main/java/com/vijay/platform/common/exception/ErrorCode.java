@@ -25,4 +25,9 @@ public final class ErrorCode {
 
     public static final String ACCESS_DENIED =
             "AUTH_ACCESS_DENIED";
+
+    public static final String USER_NOT_FOUND="USER_NOT_FOUND";
+
+    public static final String INVALID_CURRENT_PASSWORD =
+            "AUTH_INVALID_CURRENT_PASSWORD";
 }

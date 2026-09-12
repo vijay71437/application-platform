@@ -1,5 +1,7 @@
 package com.vijay.platform.common.controller;
 
+import com.vijay.platform.common.response.ApiResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,4 +12,5 @@ public class HealthController {
     public String health(){
         return "Application Platform is running";
     }
+
 }

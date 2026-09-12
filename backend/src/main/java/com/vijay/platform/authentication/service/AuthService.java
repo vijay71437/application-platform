@@ -1,7 +1,9 @@
 package com.vijay.platform.authentication.service;
 
+import com.vijay.platform.authentication.dto.ChangePasswordRequest;
 import com.vijay.platform.authentication.dto.LoginRequest;
 import com.vijay.platform.authentication.dto.LoginResponse;
+import com.vijay.platform.authentication.exception.InvalidCurrentPasswordException;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.security.jwt.JwtService;
 import com.vijay.platform.user.entity.User;
@@ -10,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -22,6 +26,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request){
         Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
@@ -30,5 +35,30 @@ public class AuthService {
         Set<String> roles=user.getRoles().stream().map(role-> role.getName()).collect(Collectors.toSet());
         Set<String> permissions=user.getRoles().stream().flatMap(role->role.getPermissions().stream()).map(permission -> permission.getName()).collect(Collectors.toSet());
         return new LoginResponse(accessToken,"Bearer", jwtService.getAccessTokenExpiration()/1000, user.getId(), user.getUsername(), roles,permissions);
+    }
+
+    public void changePassword(
+            String username,
+            ChangePasswordRequest request) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found")
+                );
+
+        if (!passwordEncoder.matches(
+                request.getCurrentPassword(),
+                user.getPassword())) {
+
+            throw new InvalidCurrentPasswordException();
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        userRepository.save(user);
     }
 }
