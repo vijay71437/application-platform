@@ -4,6 +4,8 @@ import com.vijay.platform.authentication.dto.RegisterRequest;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.repository.RoleRepository;
 import com.vijay.platform.user.entity.User;
+import com.vijay.platform.user.exception.EmailAlreadyExistsException;
+import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
 import com.vijay.platform.user.repository.UserRepository;
 import com.vijay.platform.user.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,10 +25,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User register(RegisterRequest request) {
         if(userRepository.existsByUsername(request.getUsername())){
-            throw new IllegalArgumentException("username already exits");
+            throw new UsernameAlreadyExistsException();
         }
         if(userRepository.existsByEmail(request.getEmail())){
-            throw new IllegalArgumentException("email already exists");
+            throw new EmailAlreadyExistsException();
         }
         Role userRole=roleRepository.findByName("ROLE_USER")
                 .orElseThrow(()->new IllegalArgumentException("Default role is not found"));

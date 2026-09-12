@@ -1,8 +1,10 @@
 package com.vijay.platform.authorization.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -12,7 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "permissions")
 @Getter
 @Setter
-
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
