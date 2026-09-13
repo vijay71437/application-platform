@@ -4,6 +4,7 @@ import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.user.dto.UpdateUserRequest;
 import com.vijay.platform.user.dto.UserResponse;
 import com.vijay.platform.user.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;

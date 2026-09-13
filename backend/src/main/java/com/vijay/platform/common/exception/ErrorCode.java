@@ -30,4 +30,6 @@ public final class ErrorCode {
 
     public static final String INVALID_CURRENT_PASSWORD =
             "AUTH_INVALID_CURRENT_PASSWORD";
+    public static final String INVALID_REFRESH_TOKEN =
+            "AUTH_INVALID_REFRESH_TOKEN";
 }

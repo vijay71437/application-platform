@@ -1,6 +1,7 @@
 package com.vijay.platform.common.response;
 
 import java.time.Instant;
+import com.vijay.platform.common.context.RequestContext;
 
 public class ApiResponse<T> {
 
@@ -9,6 +10,7 @@ public class ApiResponse<T> {
     private T data;
     private String errorCode;
     private Instant timestamp;
+    private String requestId;
 
     private ApiResponse(
             boolean success,
@@ -21,6 +23,7 @@ public class ApiResponse<T> {
         this.data = data;
         this.errorCode = errorCode;
         this.timestamp = Instant.now();
+        this.requestId = RequestContext.getRequestId();
     }
 
     public static <T> ApiResponse<T> success(

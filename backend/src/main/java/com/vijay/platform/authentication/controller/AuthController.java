@@ -3,6 +3,7 @@ package com.vijay.platform.authentication.controller;
 import com.vijay.platform.authentication.dto.*;
 import com.vijay.platform.authentication.service.AuthService;
 import com.vijay.platform.common.response.ApiResponse;
+import com.vijay.platform.security.service.RefreshTokenService;
 import com.vijay.platform.user.entity.User;
 import com.vijay.platform.user.service.UserService;
 import jakarta.validation.Valid;
@@ -22,16 +23,10 @@ public class AuthController {
 
     private UserService userService;
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request){
-        User user= userService.register(request);
-        RegisterResponse response = new RegisterResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName()
-        );
+        RegisterResponse response= authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body( ApiResponse.success(
                 "User registered successfully",
                 response
@@ -64,6 +59,32 @@ public class AuthController {
 
         return ApiResponse.success(
                 "Password changed successfully",
+                null
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<LoginResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request) {
+
+        return ApiResponse.success(
+                "Access token refreshed successfully",
+                authService.refreshAccessToken(
+                        request.getRefreshToken()
+                )
+        );
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(
+            @Valid @RequestBody LogoutRequest request) {
+
+        refreshTokenService.revokeRefreshToken(
+                request.getRefreshToken()
+        );
+
+        return ApiResponse.success(
+                "Logout successful",
                 null
         );
     }

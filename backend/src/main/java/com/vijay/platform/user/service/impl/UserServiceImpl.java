@@ -1,8 +1,12 @@
 package com.vijay.platform.user.service.impl;
 
+import com.vijay.platform.audit.AuditAction;
+import com.vijay.platform.audit.service.AuditService;
 import com.vijay.platform.authentication.dto.RegisterRequest;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.repository.RoleRepository;
+import com.vijay.platform.security.service.RefreshTokenService;
+import com.vijay.platform.user.dto.CreateUserRequest;
 import com.vijay.platform.user.dto.UpdateUserRequest;
 import com.vijay.platform.user.dto.UserResponse;
 import com.vijay.platform.user.entity.User;
@@ -10,6 +14,7 @@ import com.vijay.platform.user.exception.EmailAlreadyExistsException;
 import com.vijay.platform.user.exception.UserNotFoundException;
 import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
 import com.vijay.platform.user.repository.UserRepository;
+import com.vijay.platform.user.service.UserCreationService;
 import com.vijay.platform.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +31,22 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private RefreshTokenService refreshTokenService;
+    private final UserCreationService userCreationService;
+    private final AuditService auditService;
+
+    public UserResponse createUser(CreateUserRequest request) {
+
+        User user = userCreationService.create(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getFirstName(),
+                request.getLastName()
+        );
+
+        return toUserResponse(user);
+    }
 
     @Override
     @Transactional
@@ -84,6 +105,13 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.getLastName());
 
         User updatedUser = userRepository.save(user);
+        auditService.log(
+                updatedUser,
+                AuditAction.USER_UPDATED,
+                "USER",
+                updatedUser.getId().toString(),
+                "User profile updated"
+        );
 
         return toUserResponse(updatedUser);
     }
@@ -96,6 +124,16 @@ public class UserServiceImpl implements UserService {
         user.setEnabled(false);
 
         User updatedUser = userRepository.save(user);
+        refreshTokenService.revokeAllUserTokens(
+                user.getId()
+        );
+        auditService.log(
+                updatedUser,
+                AuditAction.USER_DEACTIVATED,
+                "USER",
+                updatedUser.getId().toString(),
+                "User deactivated"
+        );
 
         return toUserResponse(updatedUser);
     }

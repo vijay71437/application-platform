@@ -1,11 +1,13 @@
 package com.vijay.platform.authentication.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Set;
 @AllArgsConstructor
 @Getter
+@Builder
 public class LoginResponse {
 
     private String accessToken;
@@ -15,5 +17,6 @@ public class LoginResponse {
     private String username;
     private Set<String> roles;
     private Set<String> permissions;
+    private String refreshToken;
 
 }
