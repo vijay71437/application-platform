@@ -32,4 +32,16 @@ public final class ErrorCode {
             "AUTH_INVALID_CURRENT_PASSWORD";
     public static final String INVALID_REFRESH_TOKEN =
             "AUTH_INVALID_REFRESH_TOKEN";
+
+    public static final String ROLE_NOT_FOUND =
+            "AUTH_ROLE_NOT_FOUND";
+
+    public static final String ROLE_ALREADY_EXISTS =
+            "AUTH_ROLE_ALREADY_EXISTS";
+
+    public static final String PERMISSION_NOT_FOUND =
+            "AUTH_PERMISSION_NOT_FOUND";
+
+    public static final String PERMISSION_ALREADY_EXISTS =
+            "AUTH_PERMISSION_ALREADY_EXISTS";
 }
