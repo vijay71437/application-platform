@@ -1,17 +1,23 @@
 package com.vijay.platform.authorization.service;
 
+import com.vijay.platform.authorization.dto.AssignPermissionsRequest;
 import com.vijay.platform.authorization.dto.CreateRoleRequest;
 import com.vijay.platform.authorization.dto.RoleResponse;
 import com.vijay.platform.authorization.dto.UpdateRoleRequest;
+import com.vijay.platform.authorization.entity.Permission;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.exception.RoleAlreadyExistsException;
 import com.vijay.platform.authorization.exception.RoleNotFoundException;
+import com.vijay.platform.authorization.repository.PermissionRepository;
 import com.vijay.platform.authorization.repository.RoleRepository;
+import com.vijay.platform.common.exception.InvalidResourceReferenceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +25,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class RoleService {
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
     @Transactional(readOnly = true)
     public List<RoleResponse> getAllRoles(){
@@ -35,6 +42,7 @@ public class RoleService {
         }
         Role role=new Role();
         role.setName(request.getName());
+        role.setDescription(request.getDescription());
         Role savaedRole=roleRepository.save(role);
         return  toResponse(savaedRole);
     }
@@ -47,6 +55,7 @@ public class RoleService {
         }
 
         role.setName(request.getName());
+        role.setDescription(request.getDescription());
         Role savedRole=roleRepository.save(role);
         return toResponse(savedRole);
     }
@@ -58,6 +67,34 @@ public class RoleService {
                 .orElseThrow(() -> new RoleNotFoundException(id));
 
         roleRepository.delete(role);
+    }
+
+    @Transactional
+    public RoleResponse assignPermissions(
+            Long roleId,
+            AssignPermissionsRequest request) {
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() ->
+                        new RoleNotFoundException(roleId));
+
+        Set<Permission> permissions = new HashSet<>(
+                permissionRepository.findAllByIdIn(
+                        request.getPermissionIds()
+                )
+        );
+
+        if (permissions.size() != request.getPermissionIds().size()) {
+            throw new InvalidResourceReferenceException(
+                    "One or more role ids are invalid"
+            );
+        }
+
+        role.setPermissions(permissions);
+
+        Role updatedRole = roleRepository.save(role);
+
+        return toResponse(updatedRole);
     }
 
     public RoleResponse toResponse(Role role){

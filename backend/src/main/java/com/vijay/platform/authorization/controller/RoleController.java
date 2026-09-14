@@ -1,5 +1,6 @@
 package com.vijay.platform.authorization.controller;
 
+import com.vijay.platform.authorization.dto.AssignPermissionsRequest;
 import com.vijay.platform.authorization.dto.CreateRoleRequest;
 import com.vijay.platform.authorization.dto.RoleResponse;
 import com.vijay.platform.authorization.dto.UpdateRoleRequest;
@@ -67,6 +68,18 @@ public class RoleController {
         return ApiResponse.success(
                 "Role deleted successfully",
                 null
+        );
+    }
+
+    @PutMapping("/{id}/permissions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<RoleResponse> assignPermissions(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignPermissionsRequest request) {
+
+        return ApiResponse.success(
+                "Role permissions updated successfully",
+                roleService.assignPermissions(id, request)
         );
     }
 

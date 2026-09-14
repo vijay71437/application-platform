@@ -12,4 +12,8 @@ public class UpdatePermissionRequest {
     @NotBlank(message = "Permission name is required")
     @Size(min = 3, max = 100, message = "Permission name must be between 3 and 100 characters")
     private String name;
+
+    @NotBlank(message = "Description is required")
+    @Size(max = 255)
+    private String description;
 }

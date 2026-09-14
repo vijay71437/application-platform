@@ -1,5 +1,6 @@
 package com.vijay.platform.user.controller;
 
+import com.vijay.platform.authorization.dto.AssignRolesRequest;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.user.dto.UpdateUserRequest;
 import com.vijay.platform.user.dto.UserResponse;
@@ -63,6 +64,18 @@ public class UserController {
         return ApiResponse.success(
                 "User deactivated successfully",
                 userService.deactivateUser(id)
+        );
+    }
+
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<UserResponse> assignRoles(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignRolesRequest request) {
+
+        return ApiResponse.success(
+                "User roles updated successfully",
+                userService.assignRoles(id, request)
         );
     }
 }

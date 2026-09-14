@@ -165,6 +165,19 @@ public class GlobalExceptionHandler {
                         null
                 ));
     }
+
+    @ExceptionHandler(InvalidResourceReferenceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidResourceReference(
+            InvalidResourceReferenceException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>>
     handleException(Exception exception) {

@@ -44,4 +44,10 @@ public final class ErrorCode {
 
     public static final String PERMISSION_ALREADY_EXISTS =
             "AUTH_PERMISSION_ALREADY_EXISTS";
+
+    public static final String INVALID_RESOURCE_REFERENCE =
+            "COMMON_INVALID_RESOURCE_REFERENCE";
+
+    public static final String RESOURCE_NOT_FOUND =
+            "COMMON_RESOURCE_NOT_FOUND";
 }

@@ -50,6 +50,7 @@ public class PermissionService {
         Permission permission = new Permission();
 
         permission.setName(request.getName());
+        permission.setDescription(request.getDescription());
 
         Permission savedPermission =
                 permissionRepository.save(permission);
@@ -74,6 +75,7 @@ public class PermissionService {
         }
 
         permission.setName(request.getName());
+        permission.setDescription(request.getDescription());
 
         Permission updatedPermission =
                 permissionRepository.save(permission);

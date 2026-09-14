@@ -3,8 +3,10 @@ package com.vijay.platform.user.service.impl;
 import com.vijay.platform.audit.AuditAction;
 import com.vijay.platform.audit.service.AuditService;
 import com.vijay.platform.authentication.dto.RegisterRequest;
+import com.vijay.platform.authorization.dto.AssignRolesRequest;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.repository.RoleRepository;
+import com.vijay.platform.common.exception.InvalidResourceReferenceException;
 import com.vijay.platform.security.service.RefreshTokenService;
 import com.vijay.platform.user.dto.CreateUserRequest;
 import com.vijay.platform.user.dto.UpdateUserRequest;
@@ -21,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,6 +137,39 @@ public class UserServiceImpl implements UserService {
                 "USER",
                 updatedUser.getId().toString(),
                 "User deactivated"
+        );
+
+        return toUserResponse(updatedUser);
+    }
+
+    @Transactional
+    public UserResponse assignRoles(
+            Long userId,
+            AssignRolesRequest request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(userId));
+
+        Set<Role> roles = new HashSet<>(
+                roleRepository.findAllByIdIn(request.getRoleIds())
+        );
+
+        if (roles.size() != request.getRoleIds().size()) {
+            throw new InvalidResourceReferenceException(
+                    "One or more role ids are invalid"
+            );
+        }
+
+        user.setRoles(roles);
+
+        User updatedUser = userRepository.save(user);
+        auditService.log(
+                updatedUser,
+                AuditAction.USER_UPDATED,
+                "USER",
+                updatedUser.getId().toString(),
+                "User roles are updated"
         );
 
         return toUserResponse(updatedUser);
