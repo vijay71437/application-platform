@@ -3,6 +3,7 @@ package com.vijay.platform.security.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,15 @@ public class JwtService {
     private final SecretKey secretKey;
     private final long accessTokenExpiration;
 
-    public JwtService(
-            @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.access-token-expiration}") long accessTokenExpiration){
-        this.secretKey= Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        this.accessTokenExpiration=accessTokenExpiration;
+    public JwtService(JwtProperties jwtProperties) {
+
+        this.secretKey = Keys.hmacShaKeyFor(
+                jwtProperties.getSecret()
+                        .getBytes(StandardCharsets.UTF_8)
+        );
+
+        this.accessTokenExpiration =
+                jwtProperties.getAccessTokenExpiration();
     }
 
     public String generateAccessToken(String username){
