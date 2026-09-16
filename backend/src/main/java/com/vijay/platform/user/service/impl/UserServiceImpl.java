@@ -7,6 +7,7 @@ import com.vijay.platform.authorization.dto.AssignRolesRequest;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.repository.RoleRepository;
 import com.vijay.platform.common.exception.InvalidResourceReferenceException;
+import com.vijay.platform.common.response.PageResponse;
 import com.vijay.platform.security.service.RefreshTokenService;
 import com.vijay.platform.user.dto.CreateUserRequest;
 import com.vijay.platform.user.dto.UpdateUserRequest;
@@ -17,20 +18,23 @@ import com.vijay.platform.user.exception.UserNotFoundException;
 import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
 import com.vijay.platform.user.repository.UserRepository;
 import com.vijay.platform.user.service.UserCreationService;
-import com.vijay.platform.user.service.UserService;
+import com.vijay.platform.user.specification.UserSpecification;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl  {
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -52,7 +56,6 @@ public class UserServiceImpl implements UserService {
         return toUserResponse(user);
     }
 
-    @Override
     @Transactional
     public User register(RegisterRequest request) {
         if(userRepository.existsByUsername(request.getUsername())){
@@ -74,12 +77,25 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    public List<UserResponse> getAllUsers() {
+    @Transactional(readOnly = true)
+    public PageResponse<UserResponse> getAllUsers(int page,int size,String sortBy,String sortDirection,String search) {
+        Sort.Direction direction=Sort.Direction.fromString(sortDirection);
+        Pageable pageable= PageRequest.of(page,size,Sort.by(direction,sortBy));
+        var specification= UserSpecification.isEnabled();
+        if(search !=null && !search.isBlank()){
+             specification = specification.and(UserSpecification.search(search.trim()));
+        }
 
-        return userRepository.findAll()
-                .stream()
-                .map(this::toUserResponse)
-                .toList();
+        Page<User> userPage=userRepository.findAll(specification,pageable);
+
+        return PageResponse.<UserResponse>builder().content(userPage.getContent().stream().map(this::toUserResponse).toList())
+                .page(userPage.getNumber())
+                .size(userPage.getSize())
+                .totalElements(userPage.getTotalElements())
+                .totalPages(userPage.getTotalPages())
+                .first(userPage.isFirst())
+                .last(userPage.isLast())
+                .build();
     }
 
     public UserResponse getUserById(Long id) {

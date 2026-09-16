@@ -4,8 +4,7 @@ import com.vijay.platform.authentication.dto.*;
 import com.vijay.platform.authentication.service.AuthService;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.security.service.RefreshTokenService;
-import com.vijay.platform.user.entity.User;
-import com.vijay.platform.user.service.UserService;
+import com.vijay.platform.user.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class AuthController {
 
-    private UserService userService;
+    private UserServiceImpl userService;
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
     @PostMapping("/register")

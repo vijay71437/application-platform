@@ -2,9 +2,10 @@ package com.vijay.platform.user.controller;
 
 import com.vijay.platform.authorization.dto.AssignRolesRequest;
 import com.vijay.platform.common.response.ApiResponse;
+import com.vijay.platform.common.response.PageResponse;
 import com.vijay.platform.user.dto.UpdateUserRequest;
 import com.vijay.platform.user.dto.UserResponse;
-import com.vijay.platform.user.service.UserService;
+import com.vijay.platform.user.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,19 +18,30 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService) {
         this.userService = userService;
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('USER_READ')")
-    public ApiResponse<List<UserResponse>> getAllUsers() {
+    public ApiResponse<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(required = false) String search) {
 
         return ApiResponse.success(
                 "Users retrieved successfully",
-                userService.getAllUsers()
+                userService.getAllUsers(
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection,
+                        search
+                )
         );
     }
 
