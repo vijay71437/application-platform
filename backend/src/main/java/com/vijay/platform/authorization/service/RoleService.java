@@ -7,10 +7,12 @@ import com.vijay.platform.authorization.dto.UpdateRoleRequest;
 import com.vijay.platform.authorization.entity.Permission;
 import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.exception.RoleAlreadyExistsException;
+import com.vijay.platform.authorization.exception.RoleInUseException;
 import com.vijay.platform.authorization.exception.RoleNotFoundException;
 import com.vijay.platform.authorization.repository.PermissionRepository;
 import com.vijay.platform.authorization.repository.RoleRepository;
 import com.vijay.platform.common.exception.InvalidResourceReferenceException;
+import com.vijay.platform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<RoleResponse> getAllRoles(){
@@ -65,6 +68,9 @@ public class RoleService {
 
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RoleNotFoundException(id));
+        if (userRepository.existsByRoles_Id(id)) {
+            throw new RoleInUseException();
+        }
 
         roleRepository.delete(role);
     }

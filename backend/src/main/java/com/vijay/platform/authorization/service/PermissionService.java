@@ -2,11 +2,14 @@ package com.vijay.platform.authorization.service;
 
 import com.vijay.platform.authorization.dto.CreatePermissionRequest;
 import com.vijay.platform.authorization.dto.PermissionResponse;
+import com.vijay.platform.authorization.dto.RoleResponse;
 import com.vijay.platform.authorization.dto.UpdatePermissionRequest;
 import com.vijay.platform.authorization.entity.Permission;
 import com.vijay.platform.authorization.exception.PermissionAlreadyExistsException;
+import com.vijay.platform.authorization.exception.PermissionInUseException;
 import com.vijay.platform.authorization.exception.PermissionNotFoundException;
 import com.vijay.platform.authorization.repository.PermissionRepository;
+import com.vijay.platform.authorization.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import java.util.List;
 public class PermissionService {
 
     private final PermissionRepository permissionRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
     public List<PermissionResponse> getAllPermissions() {
@@ -89,6 +93,9 @@ public class PermissionService {
                 permissionRepository.findById(id)
                         .orElseThrow(() ->
                                 new PermissionNotFoundException(id));
+        if (roleRepository.existsByPermissions_Id(id)) {
+            throw new PermissionInUseException();
+        }
 
         permissionRepository.delete(permission);
     }

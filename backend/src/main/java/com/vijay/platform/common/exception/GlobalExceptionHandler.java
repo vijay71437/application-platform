@@ -1,6 +1,8 @@
 package com.vijay.platform.common.exception;
 
 import com.vijay.platform.authentication.exception.InvalidRefreshTokenException;
+import com.vijay.platform.authorization.exception.PermissionInUseException;
+import com.vijay.platform.authorization.exception.RoleInUseException;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.user.exception.EmailAlreadyExistsException;
 import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
@@ -172,6 +174,32 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(RoleInUseException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRoleInUse(
+            RoleInUseException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(PermissionInUseException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePermissionInUse(
+            PermissionInUseException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(
                         ex.getMessage(),
                         ex.getErrorCode(),

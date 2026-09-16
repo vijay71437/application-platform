@@ -50,4 +50,10 @@ public final class ErrorCode {
 
     public static final String RESOURCE_NOT_FOUND =
             "COMMON_RESOURCE_NOT_FOUND";
+
+    public static final String ROLE_IN_USE =
+            "AUTH_ROLE_IN_USE";
+
+    public static final String PERMISSION_IN_USE =
+            "AUTH_PERMISSION_IN_USE";
 }
