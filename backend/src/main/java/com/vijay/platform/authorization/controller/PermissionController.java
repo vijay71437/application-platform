@@ -4,6 +4,7 @@ import com.vijay.platform.authorization.dto.CreatePermissionRequest;
 import com.vijay.platform.authorization.dto.PermissionResponse;
 import com.vijay.platform.authorization.dto.UpdatePermissionRequest;
 import com.vijay.platform.authorization.service.PermissionService;
+import com.vijay.platform.common.config.ApiConstants;
 import com.vijay.platform.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/permissions")
+@RequestMapping(ApiConstants.API_V1 + "/permissions")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 public class PermissionController {

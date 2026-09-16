@@ -5,6 +5,7 @@ import com.vijay.platform.authorization.dto.CreateRoleRequest;
 import com.vijay.platform.authorization.dto.RoleResponse;
 import com.vijay.platform.authorization.dto.UpdateRoleRequest;
 import com.vijay.platform.authorization.service.RoleService;
+import com.vijay.platform.common.config.ApiConstants;
 import com.vijay.platform.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/roles")
+@RequestMapping(ApiConstants.API_V1 + "/roles")
 @SecurityRequirement(name = "bearerAuth")
 public class RoleController {
 

@@ -2,6 +2,7 @@ package com.vijay.platform.authentication.controller;
 
 import com.vijay.platform.authentication.dto.*;
 import com.vijay.platform.authentication.service.AuthService;
+import com.vijay.platform.common.config.ApiConstants;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.security.service.RefreshTokenService;
 import com.vijay.platform.user.service.impl.UserServiceImpl;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(ApiConstants.API_V1 + "/auth")
 @AllArgsConstructor
 public class AuthController {
 

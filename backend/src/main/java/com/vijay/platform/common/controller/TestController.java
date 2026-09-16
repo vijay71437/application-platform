@@ -1,5 +1,6 @@
 package com.vijay.platform.common.controller;
 
+import com.vijay.platform.common.config.ApiConstants;
 import com.vijay.platform.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping(ApiConstants.API_V1 + "/test")
 @SecurityRequirement(name = "bearerAuth")
 public class TestController {
 

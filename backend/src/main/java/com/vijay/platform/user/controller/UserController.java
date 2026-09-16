@@ -1,6 +1,7 @@
 package com.vijay.platform.user.controller;
 
 import com.vijay.platform.authorization.dto.AssignRolesRequest;
+import com.vijay.platform.common.config.ApiConstants;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.common.response.PageResponse;
 import com.vijay.platform.common.response.PaginationRequest;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(ApiConstants.API_V1 + "/users")
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
