@@ -56,4 +56,7 @@ public final class ErrorCode {
 
     public static final String PERMISSION_IN_USE =
             "AUTH_PERMISSION_IN_USE";
+
+    public static final String INVALID_PARAMETER =
+            "COMMON_INVALID_PARAMETER";
 }

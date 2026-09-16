@@ -3,6 +3,7 @@ package com.vijay.platform.user.controller;
 import com.vijay.platform.authorization.dto.AssignRolesRequest;
 import com.vijay.platform.common.response.ApiResponse;
 import com.vijay.platform.common.response.PageResponse;
+import com.vijay.platform.common.response.PaginationRequest;
 import com.vijay.platform.user.dto.UpdateUserRequest;
 import com.vijay.platform.user.dto.UserResponse;
 import com.vijay.platform.user.service.impl.UserServiceImpl;
@@ -32,14 +33,18 @@ public class UserController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(required = false) String search) {
+        PaginationRequest pagination =
+                new PaginationRequest(
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection
+                );
 
         return ApiResponse.success(
                 "Users retrieved successfully",
                 userService.getAllUsers(
-                        page,
-                        size,
-                        sortBy,
-                        sortDirection,
+                        pagination,
                         search
                 )
         );

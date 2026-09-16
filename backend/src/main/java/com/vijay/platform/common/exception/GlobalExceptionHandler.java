@@ -194,6 +194,19 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidParameter(
+            InvalidParameterException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
     @ExceptionHandler(PermissionInUseException.class)
     public ResponseEntity<ApiResponse<Void>> handlePermissionInUse(
             PermissionInUseException ex) {

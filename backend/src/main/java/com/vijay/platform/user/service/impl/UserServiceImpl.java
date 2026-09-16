@@ -8,6 +8,7 @@ import com.vijay.platform.authorization.entity.Role;
 import com.vijay.platform.authorization.repository.RoleRepository;
 import com.vijay.platform.common.exception.InvalidResourceReferenceException;
 import com.vijay.platform.common.response.PageResponse;
+import com.vijay.platform.common.response.PaginationRequest;
 import com.vijay.platform.security.service.RefreshTokenService;
 import com.vijay.platform.user.dto.CreateUserRequest;
 import com.vijay.platform.user.dto.UpdateUserRequest;
@@ -19,6 +20,7 @@ import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
 import com.vijay.platform.user.repository.UserRepository;
 import com.vijay.platform.user.service.UserCreationService;
 import com.vijay.platform.user.specification.UserSpecification;
+import com.vijay.platform.user.utils.UserSortFields;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 @Service
 @AllArgsConstructor
@@ -78,9 +81,13 @@ public class UserServiceImpl  {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<UserResponse> getAllUsers(int page,int size,String sortBy,String sortDirection,String search) {
-        Sort.Direction direction=Sort.Direction.fromString(sortDirection);
-        Pageable pageable= PageRequest.of(page,size,Sort.by(direction,sortBy));
+    public PageResponse<UserResponse> getAllUsers(PaginationRequest paginationRequest, String search) {
+        String sortField =
+                UserSortFields.validate(
+                        paginationRequest.getSortBy()
+                );
+        Sort.Direction direction=paginationRequest.getSortDirection();
+        Pageable pageable= PageRequest.of(paginationRequest.getPage(), paginationRequest.getSize(),Sort.by(direction,sortField));
         var specification= UserSpecification.isEnabled();
         if(search !=null && !search.isBlank()){
              specification = specification.and(UserSpecification.search(search.trim()));
