@@ -1,0 +1,7 @@
+com/vijay/platform/user/service/UserCreationServiceTest.class
+com/vijay/platform/authentication/service/AuthServiceTest.class
+com/vijay/platform/ApplicationPlatformApplicationTests.class
+com/vijay/platform/user/service/UserServiceTest.class
+com/vijay/platform/security/jwt/JwtServiceTest.class
+com/vijay/platform/security/service/RefreshTokenServiceTest.class
+com/vijay/platform/security/SecurityControllerTest.class

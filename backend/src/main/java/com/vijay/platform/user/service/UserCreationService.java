@@ -60,15 +60,15 @@ public class UserCreationService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.getRoles().add(defaultRole);
-        userRepository.save(user);
+        User savedUser=userRepository.save(user);
         auditService.log(
-                user,
+                savedUser,
                 AuditAction.USER_CREATED,
                 "USER",
-                user.getId().toString(),
+                savedUser.getId().toString(),
                 "User created by administrator"
         );
-        return user;
+        return savedUser;
     }
 
     private void validateUniqueUser(

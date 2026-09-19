@@ -1,0 +1,7 @@
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/ApplicationPlatformApplicationTests.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/authentication/service/AuthServiceTest.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/security/SecurityControllerTest.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/security/jwt/JwtServiceTest.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/security/service/RefreshTokenServiceTest.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/user/service/UserCreationServiceTest.java
+/Users/vijaykumarmali/Documents/projects/application-platform/backend/src/test/java/com/vijay/platform/user/service/UserServiceTest.java

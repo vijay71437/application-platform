@@ -109,7 +109,7 @@ public class UserServiceImpl  {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found")
+                        new UserNotFoundException(id)
                 );
 
         return toUserResponse(user);
