@@ -16,6 +16,6 @@ public class SecurityProperties {
     @Getter
     @Setter
     public static class Cors{
-        private String[] allowedOrigins=new String[]{"http://localhost:3000"};
+        private String[] allowedOrigins=new String[]{"http://localhost:3000","http://localhost:5173"};
     }
 }
