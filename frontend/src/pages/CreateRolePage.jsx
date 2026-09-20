@@ -5,9 +5,13 @@ import RoleForm from "../components/roles/RoleForm";
 import PageHeader from "../components/ui/PageHeader";
 
 import { getApiError } from "../api/apiError";
+import {
+    useNotification,
+} from "../components/notifications/NotificationContext";
 import { createRole } from "../services/roleService";
 
 function CreateRolePage() {
+    const notification = useNotification();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
@@ -19,6 +23,9 @@ function CreateRolePage() {
 
         try {
             await createRole(role);
+            notification.success(
+    "Role created successfully."
+);
             navigate("/roles");
         } catch (error) {
             const apiError = getApiError(error);

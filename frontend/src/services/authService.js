@@ -11,7 +11,17 @@ export async function login(username,password){
     return response.data.data;
 }
 
+export async function register(user) {
+    const response = await apiClient.post(
+        "/auth/register",
+        user,
+        {
+            skipAuth: true,
+        }
+    );
 
+    return response.data.data;
+}
 export async function refreshToken(refreshToken){
     const response= await apiClient.post("/auth/refresh-token",{
         refreshToken

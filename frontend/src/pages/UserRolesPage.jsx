@@ -11,9 +11,13 @@ import {
 } from "../services/userService";
 
 import { getApiError } from "../api/apiError";
+import {
+    useNotification,
+} from "../components/notifications/NotificationContext";
 import { getRoles } from "../services/roleService";
 
 function UserRolesPage() {
+    const notification = useNotification();
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -94,6 +98,9 @@ function UserRolesPage() {
 
         try {
             await assignRoles(id, selectedRoles);
+            notification.success(
+    "User roles updated successfully."
+);
             navigate("/users");
         } catch (error) {
             const apiError = getApiError(error);
