@@ -33,7 +33,7 @@ export async function getUserById(id) {
 export async function createUser(user) {
 
     const response = await apiClient.post(
-        "/users",
+        "/auth/register",
         user
     );
 
