@@ -2,17 +2,12 @@ import { useAuth } from "../auth/AuthContext";
 
 function DashboardPage() {
 
-    const {
-        user,
-        logout,
-    } = useAuth();
+    const { user } = useAuth();
 
     return (
         <div>
 
-            <h1>Application Platform</h1>
-
-            <h2>Dashboard</h2>
+            <h1>Dashboard</h1>
 
             <p>
                 Welcome, {user.username}
@@ -26,9 +21,11 @@ function DashboardPage() {
                 Roles: {user.roles.join(", ")}
             </p>
 
-            <button onClick={logout}>
-                Logout
-            </button>
+            <p>
+                Permissions:
+                {" "}
+                {user.permissions.join(", ")}
+            </p>
 
         </div>
     );

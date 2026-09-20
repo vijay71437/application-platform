@@ -1,0 +1,41 @@
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    padding: 24px;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar h2 {
+    margin-bottom: 32px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar a {
+    text-decoration: none;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.topbar {
+    height: 64px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+}
+
+.page-content {
+    padding: 24px;
+}
