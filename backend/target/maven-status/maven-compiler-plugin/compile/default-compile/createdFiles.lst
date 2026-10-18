@@ -1,5 +1,6 @@
 com/vijay/platform/authentication/dto/RefreshTokenRequest.class
 com/vijay/platform/authorization/service/RoleService.class
+com/vijay/platform/finance/account/dto/CreateFinanceAccountRequest.class
 com/vijay/platform/common/response/PaginationRequest.class
 com/vijay/platform/user/repository/UserRepository.class
 com/vijay/platform/user/dto/UserResponse.class
@@ -13,6 +14,7 @@ com/vijay/platform/authentication/dto/ChangePasswordRequest.class
 com/vijay/platform/ApplicationPlatformApplication.class
 com/vijay/platform/user/dto/CreateUserRequest.class
 com/vijay/platform/authorization/exception/RoleInUseException.class
+com/vijay/platform/finance/account/controller/FinanceAccountController.class
 com/vijay/platform/authorization/controller/RoleController.class
 com/vijay/platform/audit/repository/AuditLogRepository.class
 com/vijay/platform/security/jwt/JwtProperties.class
@@ -31,7 +33,9 @@ com/vijay/platform/authentication/dto/RegisterRequest.class
 com/vijay/platform/common/controller/TestController.class
 com/vijay/platform/common/exception/GlobalExceptionHandler.class
 com/vijay/platform/authentication/exception/InvalidCurrentPasswordException.class
+com/vijay/platform/finance/account/repository/FinanceAccountRepository.class
 com/vijay/platform/authorization/exception/PermissionNotFoundException.class
+com/vijay/platform/finance/account/dto/FinanceAccountResponse.class
 com/vijay/platform/authorization/dto/RoleResponse.class
 com/vijay/platform/authorization/exception/PermissionInUseException.class
 com/vijay/platform/authentication/dto/LoginResponse$LoginResponseBuilder.class
@@ -44,6 +48,7 @@ com/vijay/platform/common/exception/InvalidResourceReferenceException.class
 com/vijay/platform/authorization/dto/RoleResponse$RoleResponseBuilder.class
 com/vijay/platform/user/dto/UserResponse$UserResponseBuilder.class
 com/vijay/platform/common/exception/ErrorCode.class
+com/vijay/platform/finance/account/entity/FinanceAccount.class
 com/vijay/platform/security/jwt/JwtService.class
 com/vijay/platform/common/response/ApiResponse.class
 com/vijay/platform/security/repository/RefreshTokenRepository.class
@@ -66,10 +71,12 @@ com/vijay/platform/common/exception/BusinessException.class
 com/vijay/platform/common/response/PageResponse$PageResponseBuilder.class
 com/vijay/platform/audit/AuditAction.class
 com/vijay/platform/authentication/dto/LoginRequest.class
+com/vijay/platform/finance/account/service/FinanceAccountService.class
 com/vijay/platform/security/config/SecurityConfig.class
 com/vijay/platform/security/config/SecurityProperties.class
 com/vijay/platform/authentication/dto/RegisterResponse.class
 com/vijay/platform/common/exception/InvalidResourceException.class
+com/vijay/platform/finance/account/entity/FinanceAccountType.class
 com/vijay/platform/authorization/dto/PermissionResponse$PermissionResponseBuilder.class
 com/vijay/platform/user/entity/User.class
 com/vijay/platform/user/exception/UserNotFoundException.class

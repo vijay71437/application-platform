@@ -16,6 +16,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import com.vijay.platform.finance.category.exception.DuplicateFinanceCategoryException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,18 @@ public class GlobalExceptionHandler {
                                 null
                         )
                 );
+    }
+    @ExceptionHandler(DuplicateFinanceCategoryException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateFinanceCategory(
+            DuplicateFinanceCategoryException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

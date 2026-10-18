@@ -59,4 +59,7 @@ public final class ErrorCode {
 
     public static final String INVALID_PARAMETER =
             "COMMON_INVALID_PARAMETER";
+
+    public static final String FINANCE_CATEGORY_ALREADY_EXISTS =
+            "FINANCE_CATEGORY_ALREADY_EXISTS";
 }
