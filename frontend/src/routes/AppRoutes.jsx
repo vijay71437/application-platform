@@ -32,6 +32,13 @@ import RolesPage from "../pages/RolesPage";
 import RolePermissionsPage from "../pages/RolePermissionsPage";
 import UserRolesPage from "../pages/UserRolesPage";
 
+// Finance Pages
+import FinanceDashboardPage from "../pages/finance/FinanceDashboardPage";
+import FinanceAccountsPage from "../pages/finance/FinanceAccountsPage";
+import FinanceCategoriesPage from "../pages/finance/FinanceCategoriesPage";
+import FinanceTransactionsPage from "../pages/finance/FinanceTransactionsPage";
+import FinanceRecurringPage from "../pages/finance/FinanceRecurringPage";
+
 function AppRoutes() {
     return (
         <BrowserRouter>
@@ -53,6 +60,28 @@ function AppRoutes() {
                         <Route
                             path="/"
                             element={<DashboardPage />}
+                        />
+
+                        {/* Finance Services Routes */}
+                        <Route
+                            path="/finance"
+                            element={<FinanceDashboardPage />}
+                        />
+                        <Route
+                            path="/finance/accounts"
+                            element={<FinanceAccountsPage />}
+                        />
+                        <Route
+                            path="/finance/categories"
+                            element={<FinanceCategoriesPage />}
+                        />
+                        <Route
+                            path="/finance/transactions"
+                            element={<FinanceTransactionsPage />}
+                        />
+                        <Route
+                            path="/finance/recurring"
+                            element={<FinanceRecurringPage />}
                         />
 
                         {/* User Routes */}
@@ -140,23 +169,19 @@ function AppRoutes() {
                                 element={<UserRolesPage />}
                             />
                         </Route>
+
+                        {/* Status Routes */}
+                        <Route
+                            path="/forbidden"
+                            element={<ForbiddenPage />}
+                        />
                     </Route>
                 </Route>
 
-                {/* Error Routes */}
-                <Route
-                    path="/forbidden"
-                    element={<ForbiddenPage />}
-                />
-
+                {/* Fallback */}
                 <Route
                     path="*"
-                    element={
-                        <Navigate
-                            to="/"
-                            replace
-                        />
-                    }
+                    element={<Navigate to="/" replace />}
                 />
             </Routes>
         </BrowserRouter>

@@ -389,6 +389,9 @@
 }
 
 .logout-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 12px;
 
     border: 1px solid #d1d5db;
@@ -399,12 +402,16 @@
     color: #374151;
 
     font-size: 12px;
+    font-weight: 500;
 
     cursor: pointer;
+    transition: 0.15s;
 }
 
 .logout-button:hover {
-    background: #f9fafb;
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
 }
 
 /* ================================
