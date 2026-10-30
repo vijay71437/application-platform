@@ -366,11 +366,10 @@ Create a transaction.
 {
   "accountId": 1,
   "categoryId": 2,
-  "type": "EXPENSE",
+  "transactionType": "EXPENSE",
   "amount": 250.00,
   "description": "Weekly groceries",
-  "transactionDate": "2026-10-30",
-  "notes": "Optional notes"
+  "transactionDate": "2026-10-30"
 }
 ```
 
@@ -388,18 +387,16 @@ Get a transaction by ID.
 Filter transactions with query params.
 
 **Query Params** (`FinanceTransactionFilterRequest`):
-- `accountId` — filter by account
-- `categoryId` — filter by category
-- `type` — INCOME | EXPENSE | TRANSFER
+- `accountId` — filter by account ID
+- `categoryId` — filter by category ID
+- `transactionType` — INCOME | EXPENSE | TRANSFER
 - `startDate` — ISO date (yyyy-MM-dd)
 - `endDate` — ISO date
-- `minAmount` — minimum amount
-- `maxAmount` — maximum amount
 
 ### PUT /api/v1/finance/transactions/{id}
 Update a transaction.
 
-**Request Body:** Same fields as create (all optional — update only provided fields).
+**Request Body:** Same fields as create (`accountId`, `categoryId`, `transactionType`, `amount`, `transactionDate`, `description`).
 
 ### DELETE /api/v1/finance/transactions/{id}
 Delete a transaction.
@@ -463,7 +460,7 @@ Create a recurring transaction template.
 {
   "accountId": 1,
   "categoryId": 2,
-  "type": "EXPENSE",
+  "transactionType": "EXPENSE",
   "amount": 999.00,
   "description": "Netflix subscription",
   "frequency": "MONTHLY",

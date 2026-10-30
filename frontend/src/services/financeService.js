@@ -55,10 +55,16 @@ export async function getTransactionsPage({
 }
 
 export async function searchTransactions(filters = {}) {
-    // Filter out undefined, empty or null params
-    const cleanParams = Object.fromEntries(
-        Object.entries(filters).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
-    );
+    // Map filters to backend FinanceTransactionFilterRequest
+    const cleanParams = {};
+    if (filters.accountId) cleanParams.accountId = filters.accountId;
+    if (filters.categoryId) cleanParams.categoryId = filters.categoryId;
+    if (filters.startDate) cleanParams.startDate = filters.startDate;
+    if (filters.endDate) cleanParams.endDate = filters.endDate;
+    if (filters.transactionType || filters.type) {
+        cleanParams.transactionType = filters.transactionType || filters.type;
+    }
+
     const response = await apiClient.get("/finance/transactions/search", {
         params: cleanParams,
     });
@@ -66,12 +72,28 @@ export async function searchTransactions(filters = {}) {
 }
 
 export async function createTransaction(data) {
-    const response = await apiClient.post("/finance/transactions", data);
+    const payload = {
+        accountId: data.accountId ? Number(data.accountId) : null,
+        categoryId: data.categoryId ? Number(data.categoryId) : null,
+        transactionType: data.transactionType || data.type,
+        amount: Number(data.amount),
+        transactionDate: data.transactionDate,
+        description: data.description || null,
+    };
+    const response = await apiClient.post("/finance/transactions", payload);
     return response.data.data;
 }
 
 export async function updateTransaction(id, data) {
-    const response = await apiClient.put(`/finance/transactions/${id}`, data);
+    const payload = {
+        accountId: data.accountId ? Number(data.accountId) : null,
+        categoryId: data.categoryId ? Number(data.categoryId) : null,
+        transactionType: data.transactionType || data.type,
+        amount: Number(data.amount),
+        transactionDate: data.transactionDate,
+        description: data.description || null,
+    };
+    const response = await apiClient.put(`/finance/transactions/${id}`, payload);
     return response.data.data;
 }
 
@@ -109,12 +131,32 @@ export async function getActiveRecurringTransactions() {
 }
 
 export async function createRecurringTransaction(data) {
-    const response = await apiClient.post("/finance/recurring-transactions", data);
+    const payload = {
+        accountId: data.accountId ? Number(data.accountId) : null,
+        categoryId: data.categoryId ? Number(data.categoryId) : null,
+        transactionType: data.transactionType || data.type,
+        amount: Number(data.amount),
+        description: data.description || null,
+        frequency: data.frequency,
+        startDate: data.startDate,
+        endDate: data.endDate || null,
+    };
+    const response = await apiClient.post("/finance/recurring-transactions", payload);
     return response.data.data;
 }
 
 export async function updateRecurringTransaction(id, data) {
-    const response = await apiClient.put(`/finance/recurring-transactions/${id}`, data);
+    const payload = {
+        accountId: data.accountId ? Number(data.accountId) : null,
+        categoryId: data.categoryId ? Number(data.categoryId) : null,
+        transactionType: data.transactionType || data.type,
+        amount: Number(data.amount),
+        description: data.description || null,
+        frequency: data.frequency,
+        startDate: data.startDate,
+        endDate: data.endDate || null,
+    };
+    const response = await apiClient.put(`/finance/recurring-transactions/${id}`, payload);
     return response.data.data;
 }
 

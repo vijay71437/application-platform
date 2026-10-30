@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
     Plus,
     CalendarClock,
@@ -9,14 +10,12 @@ import {
     XCircle,
     RefreshCw,
     Wand2,
-    Calendar,
     Clock,
-    History,
+    AlertCircle,
 } from "lucide-react";
 import {
     getRecurringTransactions,
     createRecurringTransaction,
-    updateRecurringTransaction,
     pauseRecurringTransaction,
     resumeRecurringTransaction,
     deactivateRecurringTransaction,
@@ -26,7 +25,6 @@ import {
     skipOccurrence,
     getAccounts,
     getCategories,
-    getOccurrenceSummary,
 } from "../../services/financeService";
 import { getApiError } from "../../api/apiError";
 import { useNotification } from "../../components/notifications/NotificationContext";
@@ -48,7 +46,7 @@ const FREQUENCIES = [
 
 function FinanceRecurringPage() {
     const notification = useNotification();
-    const [activeTab, setActiveTab] = useState("PENDING"); // PENDING | TEMPLATES | SUMMARY
+    const [activeTab, setActiveTab] = useState("PENDING"); // PENDING | TEMPLATES
     const [recurringList, setRecurringList] = useState([]);
     const [pendingOccurrences, setPendingOccurrences] = useState([]);
     const [accounts, setAccounts] = useState([]);
@@ -69,7 +67,7 @@ function FinanceRecurringPage() {
     const [form, setForm] = useState({
         accountId: "",
         categoryId: "",
-        type: "EXPENSE",
+        transactionType: "EXPENSE",
         amount: "",
         description: "",
         frequency: "MONTHLY",
@@ -185,23 +183,35 @@ function FinanceRecurringPage() {
     // Create Recurring Submit
     async function handleCreateRecurring(e) {
         e.preventDefault();
-        if (!form.description.trim()) {
-            setFormError("Description is required.");
+        if (!form.accountId) {
+            setFormError("Account is required. Please select or create an account.");
+            return;
+        }
+        if (!form.categoryId) {
+            setFormError("Category is required. Please select or create a category.");
+            return;
+        }
+        if (!form.transactionType) {
+            setFormError("Transaction type is required.");
             return;
         }
         if (!form.amount || Number(form.amount) <= 0) {
             setFormError("Valid amount is required.");
             return;
         }
+        if (!form.startDate) {
+            setFormError("Start date is required.");
+            return;
+        }
 
         try {
             setSubmitting(true);
             await createRecurringTransaction({
-                accountId: form.accountId ? Number(form.accountId) : null,
-                categoryId: form.categoryId ? Number(form.categoryId) : null,
-                type: form.type,
+                accountId: Number(form.accountId),
+                categoryId: Number(form.categoryId),
+                transactionType: form.transactionType,
                 amount: parseFloat(form.amount),
-                description: form.description.trim(),
+                description: form.description.trim() || null,
                 frequency: form.frequency,
                 startDate: form.startDate,
                 endDate: form.endDate || null,
@@ -209,9 +219,9 @@ function FinanceRecurringPage() {
             notification.success("Recurring transaction created!");
             setIsCreateModalOpen(false);
             setForm({
-                accountId: "",
-                categoryId: "",
-                type: "EXPENSE",
+                accountId: accounts[0]?.id || "",
+                categoryId: categories[0]?.id || "",
+                transactionType: "EXPENSE",
                 amount: "",
                 description: "",
                 frequency: "MONTHLY",
@@ -231,6 +241,8 @@ function FinanceRecurringPage() {
         (sum, o) => sum + (Number(o.recurringTransaction?.amount || o.amount) || 0),
         0
     );
+
+    const hasPrerequisites = accounts.length > 0 && categories.length > 0;
 
     return (
         <div>
@@ -259,6 +271,16 @@ function FinanceRecurringPage() {
                             icon={Plus}
                             onClick={() => {
                                 setFormError("");
+                                setForm({
+                                    accountId: accounts[0]?.id || "",
+                                    categoryId: categories[0]?.id || "",
+                                    transactionType: "EXPENSE",
+                                    amount: "",
+                                    description: "",
+                                    frequency: "MONTHLY",
+                                    startDate: new Date().toISOString().split("T")[0],
+                                    endDate: "",
+                                });
                                 setIsCreateModalOpen(true);
                             }}
                         >
@@ -267,6 +289,41 @@ function FinanceRecurringPage() {
                     </div>
                 }
             />
+
+            {/* Prerequisites Warning */}
+            {!loading && !hasPrerequisites && (
+                <div className="pending-banner" style={{ background: "#eff6ff", borderColor: "#bfdbfe" }}>
+                    <div className="pending-banner-left">
+                        <div className="pending-icon-circle" style={{ background: "#3b82f6" }}>
+                            <AlertCircle size={20} />
+                        </div>
+                        <div>
+                            <strong style={{ color: "#1e3a8a" }}>
+                                Accounts & Categories Setup Needed
+                            </strong>
+                            <p style={{ color: "#1d4ed8" }}>
+                                Recurring rules require both an account and category. Please create them first.
+                            </p>
+                        </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        {accounts.length === 0 && (
+                            <Link to="/finance/accounts">
+                                <Button size="sm" variant="primary">
+                                    + Add Account
+                                </Button>
+                            </Link>
+                        )}
+                        {categories.length === 0 && (
+                            <Link to="/finance/categories">
+                                <Button size="sm" variant="outline">
+                                    + Add Category
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Quick Metrics */}
             <div className="stats-grid" style={{ marginBottom: "20px" }}>
@@ -356,7 +413,7 @@ function FinanceRecurringPage() {
                                     <tr>
                                         <th>Scheduled Date</th>
                                         <th>Description</th>
-                                        <th>Template Details</th>
+                                        <th>Frequency</th>
                                         <th>Status</th>
                                         <th style={{ textAlign: "right" }}>Amount</th>
                                         <th style={{ textAlign: "right" }}>Action</th>
@@ -365,7 +422,8 @@ function FinanceRecurringPage() {
                                 <tbody>
                                     {pendingOccurrences.map((occ) => {
                                         const rec = occ.recurringTransaction || {};
-                                        const isIncome = rec.type === "INCOME";
+                                        const txType = rec.transactionType || rec.type || occ.transactionType || "EXPENSE";
+                                        const isIncome = txType === "INCOME";
 
                                         return (
                                             <tr key={occ.id}>
@@ -374,8 +432,8 @@ function FinanceRecurringPage() {
                                                 </td>
                                                 <td>
                                                     <strong>{rec.description || occ.description || "Recurring item"}</strong>
-                                                    {rec.account && (
-                                                        <span className="tx-notes">Account: {rec.account.name}</span>
+                                                    {rec.accountName && (
+                                                        <span className="tx-notes">Account: {rec.accountName}</span>
                                                     )}
                                                 </td>
                                                 <td>
@@ -478,28 +536,31 @@ function FinanceRecurringPage() {
                                 </thead>
                                 <tbody>
                                     {recurringList.map((rec) => {
-                                        const isIncome = rec.type === "INCOME";
+                                        const txType = rec.transactionType || rec.type;
+                                        const isIncome = txType === "INCOME";
+                                        const accTitle = rec.accountName || rec.account?.name;
+                                        const catTitle = rec.categoryName || rec.category?.name;
 
                                         return (
                                             <tr key={rec.id}>
                                                 <td>
-                                                    <strong>{rec.description}</strong>
+                                                    <strong>{rec.description || "—"}</strong>
                                                 </td>
                                                 <td>
                                                     <span className="category-pill">{rec.frequency}</span>
                                                 </td>
                                                 <td>
                                                     <div style={{ fontSize: "12px" }}>
-                                                        {rec.account?.name ? (
+                                                        {accTitle && (
                                                             <span className="account-pill" style={{ marginRight: "4px" }}>
-                                                                {rec.account.name}
+                                                                {accTitle}
                                                             </span>
-                                                        ) : null}
-                                                        {rec.category?.name ? (
+                                                        )}
+                                                        {catTitle && (
                                                             <span className="category-pill">
-                                                                {rec.category.name}
+                                                                {catTitle}
                                                             </span>
-                                                        ) : null}
+                                                        )}
                                                     </div>
                                                 </td>
                                                 <td className="text-muted" style={{ fontSize: "12px" }}>
@@ -625,10 +686,10 @@ function FinanceRecurringPage() {
                 <form onSubmit={handleCreateRecurring} className="standard-form">
                     <div className="form-row-2">
                         <div className="form-group">
-                            <label className="form-label">Type</label>
+                            <label className="form-label">Transaction Type *</label>
                             <select
-                                value={form.type}
-                                onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
+                                value={form.transactionType}
+                                onChange={(e) => setForm((p) => ({ ...p, transactionType: e.target.value }))}
                                 className="form-select"
                             >
                                 <option value="EXPENSE">Expense</option>
@@ -653,8 +714,11 @@ function FinanceRecurringPage() {
 
                     <div className="form-row-2">
                         <div className="form-group">
-                            <label className="form-label">Amount (₹) *</label>
+                            <label className="form-label" htmlFor="rec-amount">
+                                Amount (₹) *
+                            </label>
                             <input
+                                id="rec-amount"
                                 type="number"
                                 step="0.01"
                                 required
@@ -665,8 +729,11 @@ function FinanceRecurringPage() {
                             />
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Start Date *</label>
+                            <label className="form-label" htmlFor="rec-start-date">
+                                Start Date *
+                            </label>
                             <input
+                                id="rec-start-date"
                                 type="date"
                                 required
                                 value={form.startDate}
@@ -676,27 +743,19 @@ function FinanceRecurringPage() {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Description *</label>
-                        <input
-                            type="text"
-                            required
-                            placeholder="e.g. Netflix, Gym Membership, House Rent"
-                            value={form.description}
-                            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-                            className="form-input"
-                        />
-                    </div>
-
                     <div className="form-row-2">
                         <div className="form-group">
-                            <label className="form-label">Account</label>
+                            <label className="form-label" htmlFor="rec-account">
+                                Account *
+                            </label>
                             <select
+                                id="rec-account"
+                                required
                                 value={form.accountId}
                                 onChange={(e) => setForm((p) => ({ ...p, accountId: e.target.value }))}
                                 className="form-select"
                             >
-                                <option value="">Select Account (Optional)</option>
+                                <option value="">Select Account</option>
                                 {accounts.map((a) => (
                                     <option key={a.id} value={a.id}>
                                         {a.name} ({a.type})
@@ -705,13 +764,17 @@ function FinanceRecurringPage() {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Category</label>
+                            <label className="form-label" htmlFor="rec-category">
+                                Category *
+                            </label>
                             <select
+                                id="rec-category"
+                                required
                                 value={form.categoryId}
                                 onChange={(e) => setForm((p) => ({ ...p, categoryId: e.target.value }))}
                                 className="form-select"
                             >
-                                <option value="">Select Category (Optional)</option>
+                                <option value="">Select Category</option>
                                 {categories.map((c) => (
                                     <option key={c.id} value={c.id}>
                                         {c.name} ({c.type})
@@ -722,8 +785,26 @@ function FinanceRecurringPage() {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">End Date (Optional)</label>
+                        <label className="form-label" htmlFor="rec-desc">
+                            Description (Max 255 chars)
+                        </label>
                         <input
+                            id="rec-desc"
+                            type="text"
+                            maxLength={255}
+                            placeholder="e.g. Netflix, Gym Membership, House Rent"
+                            value={form.description}
+                            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                            className="form-input"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="rec-end-date">
+                            End Date (Optional)
+                        </label>
+                        <input
+                            id="rec-end-date"
                             type="date"
                             value={form.endDate}
                             onChange={(e) => setForm((p) => ({ ...p, endDate: e.target.value }))}

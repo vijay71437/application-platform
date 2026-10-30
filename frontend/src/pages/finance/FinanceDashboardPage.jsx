@@ -366,7 +366,9 @@ function FinanceDashboardPage() {
                         ) : (
                             <div className="recent-tx-list">
                                 {recentTransactions.map((tx) => {
-                                    const isIncome = tx.type === "INCOME";
+                                    const txType = tx.transactionType || tx.type;
+                                    const isIncome = txType === "INCOME";
+                                    const catName = tx.categoryName || tx.category?.name || "General";
                                     return (
                                         <div key={tx.id} className="recent-tx-item">
                                             <div className="recent-tx-left">
@@ -379,7 +381,7 @@ function FinanceDashboardPage() {
                                                     <strong>{tx.description}</strong>
                                                     <span className="text-muted">
                                                         {formatDate(tx.transactionDate)} •{" "}
-                                                        {tx.category?.name || "General"}
+                                                        {catName}
                                                     </span>
                                                 </div>
                                             </div>

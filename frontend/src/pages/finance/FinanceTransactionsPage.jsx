@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
     Plus,
     Filter,
@@ -9,8 +10,8 @@ import {
     ArrowDownRight,
     ArrowRightLeft,
     Receipt,
-    Calendar,
     Search,
+    AlertCircle,
 } from "lucide-react";
 import {
     getAccounts,
@@ -46,11 +47,9 @@ function FinanceTransactionsPage() {
     const [filters, setFilters] = useState({
         accountId: "",
         categoryId: "",
-        type: "",
+        transactionType: "",
         startDate: "",
         endDate: "",
-        minAmount: "",
-        maxAmount: "",
     });
     const [showFilters, setShowFilters] = useState(false);
 
@@ -63,11 +62,10 @@ function FinanceTransactionsPage() {
     const initialFormData = {
         accountId: "",
         categoryId: "",
-        type: "EXPENSE",
+        transactionType: "EXPENSE",
         amount: "",
         description: "",
         transactionDate: new Date().toISOString().split("T")[0],
-        notes: "",
     };
 
     const [formData, setFormData] = useState(initialFormData);
@@ -93,7 +91,7 @@ function FinanceTransactionsPage() {
 
     useEffect(() => {
         loadData();
-    }, [filters.accountId, filters.categoryId, filters.type]);
+    }, [filters.accountId, filters.categoryId, filters.transactionType]);
 
     function handleFilterChange(e) {
         const { name, value } = e.target;
@@ -104,11 +102,9 @@ function FinanceTransactionsPage() {
         setFilters({
             accountId: "",
             categoryId: "",
-            type: "",
+            transactionType: "",
             startDate: "",
             endDate: "",
-            minAmount: "",
-            maxAmount: "",
         });
         loadData();
     }
@@ -127,13 +123,12 @@ function FinanceTransactionsPage() {
     function handleOpenEdit(tx) {
         setEditingTx(tx);
         setFormData({
-            accountId: tx.account?.id || tx.accountId || "",
-            categoryId: tx.category?.id || tx.categoryId || "",
-            type: tx.type || "EXPENSE",
+            accountId: tx.accountId || tx.account?.id || "",
+            categoryId: tx.categoryId || tx.category?.id || "",
+            transactionType: tx.transactionType || tx.type || "EXPENSE",
             amount: tx.amount || "",
             description: tx.description || "",
             transactionDate: tx.transactionDate || "",
-            notes: tx.notes || "",
         });
         setFormError("");
         setIsAddModalOpen(true);
@@ -141,8 +136,17 @@ function FinanceTransactionsPage() {
 
     async function handleFormSubmit(e) {
         e.preventDefault();
-        if (!formData.description.trim()) {
-            setFormError("Description is required.");
+
+        if (!formData.accountId) {
+            setFormError("Account is required. Please select or create an account.");
+            return;
+        }
+        if (!formData.categoryId) {
+            setFormError("Category is required. Please select or create a category.");
+            return;
+        }
+        if (!formData.transactionType) {
+            setFormError("Transaction type is required.");
             return;
         }
         if (!formData.amount || Number(formData.amount) <= 0) {
@@ -157,13 +161,12 @@ function FinanceTransactionsPage() {
         try {
             setSubmitting(true);
             const payload = {
-                accountId: formData.accountId ? Number(formData.accountId) : null,
-                categoryId: formData.categoryId ? Number(formData.categoryId) : null,
-                type: formData.type,
+                accountId: Number(formData.accountId),
+                categoryId: Number(formData.categoryId),
+                transactionType: formData.transactionType,
                 amount: parseFloat(formData.amount),
-                description: formData.description.trim(),
+                description: formData.description.trim() || null,
                 transactionDate: formData.transactionDate,
-                notes: formData.notes.trim() || null,
             };
 
             if (editingTx) {
@@ -201,12 +204,14 @@ function FinanceTransactionsPage() {
 
     // Totals for current filtered list
     const totalIncome = transactions
-        .filter((t) => t.type === "INCOME")
+        .filter((t) => (t.transactionType || t.type) === "INCOME")
         .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
     const totalExpense = transactions
-        .filter((t) => t.type === "EXPENSE")
+        .filter((t) => (t.transactionType || t.type) === "EXPENSE")
         .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+    const hasPrerequisites = accounts.length > 0 && categories.length > 0;
 
     return (
         <div>
@@ -236,6 +241,45 @@ function FinanceTransactionsPage() {
                     </div>
                 }
             />
+
+            {/* Prerequisites Warning */}
+            {!loading && !hasPrerequisites && (
+                <div className="pending-banner" style={{ background: "#eff6ff", borderColor: "#bfdbfe" }}>
+                    <div className="pending-banner-left">
+                        <div className="pending-icon-circle" style={{ background: "#3b82f6" }}>
+                            <AlertCircle size={20} />
+                        </div>
+                        <div>
+                            <strong style={{ color: "#1e3a8a" }}>
+                                {accounts.length === 0 && categories.length === 0
+                                    ? "Accounts & Categories Setup Needed"
+                                    : accounts.length === 0
+                                    ? "No Finance Account Found"
+                                    : "No Finance Category Found"}
+                            </strong>
+                            <p style={{ color: "#1d4ed8" }}>
+                                Transactions require both an account and category. Please create them before recording transactions.
+                            </p>
+                        </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        {accounts.length === 0 && (
+                            <Link to="/finance/accounts">
+                                <Button size="sm" variant="primary">
+                                    + Add Account
+                                </Button>
+                            </Link>
+                        )}
+                        {categories.length === 0 && (
+                            <Link to="/finance/categories">
+                                <Button size="sm" variant="outline">
+                                    + Add Category
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Quick Metrics */}
             <div className="stats-grid" style={{ marginBottom: "20px" }}>
@@ -301,8 +345,8 @@ function FinanceTransactionsPage() {
                         <div className="form-group">
                             <label className="form-label">Type</label>
                             <select
-                                name="type"
-                                value={filters.type}
+                                name="transactionType"
+                                value={filters.transactionType}
                                 onChange={handleFilterChange}
                                 className="form-select"
                             >
@@ -379,8 +423,11 @@ function FinanceTransactionsPage() {
                             </thead>
                             <tbody>
                                 {transactions.map((tx) => {
-                                    const isIncome = tx.type === "INCOME";
-                                    const isExpense = tx.type === "EXPENSE";
+                                    const txType = tx.transactionType || tx.type;
+                                    const isIncome = txType === "INCOME";
+                                    const isExpense = txType === "EXPENSE";
+                                    const accountTitle = tx.accountName || tx.account?.name || `Account #${tx.accountId}`;
+                                    const categoryTitle = tx.categoryName || tx.category?.name || `Category #${tx.categoryId}`;
 
                                     return (
                                         <tr key={tx.id}>
@@ -389,20 +436,17 @@ function FinanceTransactionsPage() {
                                             </td>
                                             <td>
                                                 <div className="tx-desc-cell">
-                                                    <strong>{tx.description}</strong>
-                                                    {tx.notes && (
-                                                        <span className="tx-notes">{tx.notes}</span>
-                                                    )}
+                                                    <strong>{tx.description || "—"}</strong>
                                                 </div>
                                             </td>
                                             <td>
                                                 <span className="category-pill">
-                                                    {tx.category?.name || tx.categoryName || "Uncategorized"}
+                                                    {categoryTitle}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span className="account-pill">
-                                                    {tx.account?.name || tx.accountName || "—"}
+                                                    {accountTitle}
                                                 </span>
                                             </td>
                                             <td>
@@ -415,7 +459,7 @@ function FinanceTransactionsPage() {
                                                             : "info"
                                                     }
                                                 >
-                                                    {tx.type}
+                                                    {txType}
                                                 </Badge>
                                             </td>
                                             <td style={{ textAlign: "right" }}>
@@ -480,11 +524,11 @@ function FinanceTransactionsPage() {
                 )}
                 <form onSubmit={handleFormSubmit} className="standard-form">
                     <div className="form-group">
-                        <label className="form-label">Transaction Type</label>
+                        <label className="form-label">Transaction Type *</label>
                         <div className="type-toggle-group-3">
                             {TRANSACTION_TYPES.map((t) => {
                                 const Icon = t.icon;
-                                const isSelected = formData.type === t.value;
+                                const isSelected = formData.transactionType === t.value;
                                 return (
                                     <button
                                         key={t.value}
@@ -493,7 +537,7 @@ function FinanceTransactionsPage() {
                                             isSelected ? `active-${t.color}` : ""
                                         }`}
                                         onClick={() =>
-                                            setFormData((p) => ({ ...p, type: t.value }))
+                                            setFormData((p) => ({ ...p, transactionType: t.value }))
                                         }
                                     >
                                         <Icon size={16} />
@@ -546,39 +590,22 @@ function FinanceTransactionsPage() {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label" htmlFor="tx-desc">
-                            Description *
-                        </label>
-                        <input
-                            id="tx-desc"
-                            name="description"
-                            type="text"
-                            required
-                            placeholder="e.g. Grocery run at Spencer's, Monthly salary"
-                            value={formData.description}
-                            onChange={(e) =>
-                                setFormData((p) => ({ ...p, description: e.target.value }))
-                            }
-                            className="form-input"
-                        />
-                    </div>
-
                     <div className="form-row-2">
                         <div className="form-group">
                             <label className="form-label" htmlFor="tx-account">
-                                Account
+                                Account *
                             </label>
                             <select
                                 id="tx-account"
                                 name="accountId"
+                                required
                                 value={formData.accountId}
                                 onChange={(e) =>
                                     setFormData((p) => ({ ...p, accountId: e.target.value }))
                                 }
                                 className="form-select"
                             >
-                                <option value="">Select Account (Optional)</option>
+                                <option value="">Select Account</option>
                                 {accounts.map((a) => (
                                     <option key={a.id} value={a.id}>
                                         {a.name} ({a.type})
@@ -589,18 +616,19 @@ function FinanceTransactionsPage() {
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="tx-category">
-                                Category
+                                Category *
                             </label>
                             <select
                                 id="tx-category"
                                 name="categoryId"
+                                required
                                 value={formData.categoryId}
                                 onChange={(e) =>
                                     setFormData((p) => ({ ...p, categoryId: e.target.value }))
                                 }
                                 className="form-select"
                             >
-                                <option value="">Select Category (Optional)</option>
+                                <option value="">Select Category</option>
                                 {categories.map((c) => (
                                     <option key={c.id} value={c.id}>
                                         {c.name} ({c.type})
@@ -611,19 +639,20 @@ function FinanceTransactionsPage() {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label" htmlFor="tx-notes">
-                            Notes (Optional)
+                        <label className="form-label" htmlFor="tx-desc">
+                            Description (Max 255 chars)
                         </label>
-                        <textarea
-                            id="tx-notes"
-                            name="notes"
-                            rows="2"
-                            placeholder="Additional details, bill invoice IDs, or context"
-                            value={formData.notes}
+                        <input
+                            id="tx-desc"
+                            name="description"
+                            type="text"
+                            maxLength={255}
+                            placeholder="e.g. Grocery run at Spencer's, Monthly salary"
+                            value={formData.description}
                             onChange={(e) =>
-                                setFormData((p) => ({ ...p, notes: e.target.value }))
+                                setFormData((p) => ({ ...p, description: e.target.value }))
                             }
-                            className="form-textarea"
+                            className="form-input"
                         />
                     </div>
 
