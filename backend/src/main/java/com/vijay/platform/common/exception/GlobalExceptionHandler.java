@@ -4,6 +4,10 @@ import com.vijay.platform.authentication.exception.InvalidRefreshTokenException;
 import com.vijay.platform.authorization.exception.PermissionInUseException;
 import com.vijay.platform.authorization.exception.RoleInUseException;
 import com.vijay.platform.common.response.ApiResponse;
+import com.vijay.platform.finance.transaction.exception.FinanceResourceAccessException;
+import com.vijay.platform.finance.transaction.exception.FinanceResourceNotFoundException;
+import com.vijay.platform.finance.transaction.exception.FinanceTransactionNotFoundException;
+import com.vijay.platform.finance.transaction.exception.FinanceTransactionValidationException;
 import com.vijay.platform.user.exception.EmailAlreadyExistsException;
 import com.vijay.platform.user.exception.UsernameAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -89,6 +93,55 @@ public class GlobalExceptionHandler {
                         null
                 ));
     }
+
+    @ExceptionHandler(FinanceTransactionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFinanceTransactionNotFound(
+            FinanceTransactionNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(FinanceResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFinanceResourceNotFound(
+            FinanceResourceNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(FinanceResourceAccessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFinanceResourceAccessDenied(
+            FinanceResourceAccessException ex) {
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(FinanceTransactionValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFinanceTransactionValidation(
+            FinanceTransactionValidationException ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(
+                        ex.getMessage(),
+                        ex.getErrorCode(),
+                        null
+                ));
+    }
+
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
